@@ -1,4 +1,10 @@
 import express from "express";
+import dotenv from "dotenv";
+import { startSendOtpCustomer } from "./consumer.js";
+
+dotenv.config();
+
+startSendOtpCustomer();
 
 const app = express();
 

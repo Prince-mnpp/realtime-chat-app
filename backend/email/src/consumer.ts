@@ -4,8 +4,6 @@ import nodemailer from "nodemailer";
 
 dotenv.config();
 
-let channel : amqp.Channel;
-
 export const startSendOtpCustomer = async () => {
   try {
     const connection = await amqp.connect({
@@ -16,7 +14,7 @@ export const startSendOtpCustomer = async () => {
       password: process.env.Rabbitmq_Password!,
     })
 
-    channel = await connection.createChannel();
+    const channel = await connection.createChannel();
 
     const queueName = "send-otp";
 
