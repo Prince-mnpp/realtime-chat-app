@@ -1,6 +1,6 @@
 import amqp from "amqplib";
 
-let channel: amqp.Channel;
+let channel: amqp.Channel | null = null;
 
 export const connectRabbitMQ = async () => {
   try {
@@ -10,7 +10,8 @@ export const connectRabbitMQ = async () => {
       port: 5672,
       username: process.env.Rabbitmq_Username!,
       password: process.env.Rabbitmq_Password!,
-    });
+    },
+  {timeout: 5000});
 
     channel = await connection.createChannel();
 
@@ -22,7 +23,7 @@ export const connectRabbitMQ = async () => {
 
 export const publishToQueue = async(queueName: string, message: any) => {
   if(!channel){
-    console.log("RabbitMq channel is not initialised");
+    throw new Error("RabbitMq channel is not initialised");
   }
 
   await channel.assertQueue(queueName, {durable: true});
