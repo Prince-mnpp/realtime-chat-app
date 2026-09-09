@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import TryCatch from "../config/TryCatch.js";
 import { redisClient } from "../index.js";
 import { publishToQueue } from "../config/rabbitmq.js";
-import User from "../model/User.js";
+import {User} from "../model/User.js";
 import { generateToken } from "../config/generateToken.js";
 
 export const loginUser = TryCatch(async(req : Request, res :        Response) => {
