@@ -115,3 +115,4 @@ export const updateName = TryCatch(async(req: AuthenticatedRequest, res) => {
     token,
   });
 });
+
