@@ -1,6 +1,7 @@
+'use client'
+
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import { headers } from "next/headers";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 

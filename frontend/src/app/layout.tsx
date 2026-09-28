@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import React from "react";
+import { AppProvider } from "@/context/AppContext";
 
 
 
@@ -14,7 +15,11 @@ export default function RootLayout({ children }: Readonly<{children: React.React
     <html
       lang="en"
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body>
+        <AppProvider>
+          {children}
+        </AppProvider>
+      </body>
     </html>
   );
 }

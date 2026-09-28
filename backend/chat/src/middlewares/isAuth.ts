@@ -1,5 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import type { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import type { JwtPayload } from "jsonwebtoken";
 
 interface IUser extends Document {
   _id: string;
@@ -29,7 +30,7 @@ export const isAuth = async (
     const token = authHeader.split(" ")[1];
 
     const decodedValue = jwt.verify(
-      token,
+      token!,
       process.env.JWT_SECRET as string
     ) as JwtPayload;
 

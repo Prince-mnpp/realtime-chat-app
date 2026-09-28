@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const connectdb = async () => {
-  const url = process.env.MONGO_URL;
+  const url = process.env.MONGO_URL!;
 
   if(!url) {
     throw new Error("Mongo url not found");
