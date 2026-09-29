@@ -1,7 +1,7 @@
 'use client'
 
 import { User } from '@/context/AppContext';
-import { Link, LogOut, MessageCircle, Plus, Search, UserCircle, X } from 'lucide-react';
+import { CornerDownRight, CornerUpLeft, Link, LogOut, MessageCircle, Plus, Search, UserCircle, X } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface ChatSidebarProps {
@@ -154,12 +154,36 @@ const ChatSidebar = ({
                             <span className='absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-green-500 border-2 border-gray-900'/>
                           </div>
 
-                          <div>
-                            <div>
-                              <span>
-
+                          <div className='flex-1 min-w-0'>
+                            <div className='flex items-center justify-between mb-1'>
+                              <span className={`font-semibold truncate ${isSelected ? "text-white" : "text-gray-200"}`}>
+                                {chat.user.name}
                               </span>
+                              {unseenCount > 0 && (
+                                <div className='bg-red-600 text-white text-xs font-bold rounded-full min-w-5.5 h-5.5 flex items-center justify-center px-2'>
+                                  {unseenCount > 99 ? "99+" : unseenCount}
+                                </div>
+                              )}
                             </div>
+
+                            {latestMessage && (
+                        <div className="flex items-center gap-2">
+                          {isSentByMe ? (
+                            <CornerUpLeft
+                              size={14}
+                              className="text-blue-400 text-shrink-0"
+                            />
+                          ) : (
+                            <CornerDownRight
+                              size={14}
+                              className="text-green-400 text-shrink-0"
+                            />
+                          )}
+                          <span className="text-sm text-gray-400 truncate flex-1">
+                            {latestMessage.text}
+                          </span>
+                        </div>
+                      )}
                           </div>
                         </div>
                       </button>
@@ -179,7 +203,7 @@ const ChatSidebar = ({
 
         {/* footer */}
 
-        <div>
+        <div className='p-4 border-t border-gray-700 space-y-2'>
           <Link
             href={"/profile"}
             className='flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors'
@@ -194,11 +218,12 @@ const ChatSidebar = ({
 
           <button
             onClick={handleLogout}
-            className='w-full flex items'
+            className='w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600 transition-colors text-red-500 hover:text-white'
           >
             <div className='p-1.5 bg-red-600 rounded-lg'>
               <LogOut className='w-4 h-4 text-gray-300'/>
             </div>
+            <span className='font-medium'>Logout</span>
           </button>
         </div>
     </aside>
