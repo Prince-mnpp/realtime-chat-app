@@ -8,6 +8,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import Loading from '@/components/Loading';
 import ChatSidebar from '@/components/ChatSidebar';
+import ChatMessages from '@/components/ChatMessages';
+import MessageInput from '@/components/MessageInput';
 
 export interface Message {
   _id: string;
@@ -156,6 +158,63 @@ const ChatApp = () => {
     }
   }
 
+  const handleMessageSend = async(e: any, imageFile?: File | null) => {
+    e.preventDefault();
+
+    if(!message.trim() && !imageFile) return;
+
+    if(!selectedUser) return;
+
+    // scoket work
+
+
+    const token = Cookies.get("token");
+
+    try {
+      const formData = new FormData();
+
+      formData.append("chatId", selectedUser);
+
+      if(message.trim()){
+        formData.append("text", message);
+      }
+
+      if(imageFile){
+        formData.append("image", imageFile);
+      }
+
+      const { data } = await axios.post(
+        `${chat_service}/api/v1/message`,
+        formData,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type" : "multipart/form-data",
+          },
+        }
+      );
+
+      setMessages((prev) => {
+        const currentMessages = prev || [];
+        const messageExists = currentMessages.some(
+          (msg) => msg._id === data.message._id
+        );
+
+        if(!messageExists){
+          return [...currentMessages, data.message];
+        }
+        return currentMessages;
+      });
+
+      setMessage("");
+
+      const displayText = imageFile ? "📸 image" : message;
+
+      
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  }
+
   const handleTyping = (value: string) => {
     
   }
@@ -179,7 +238,18 @@ const ChatApp = () => {
         // onlineUsers={onlineUsers}
       />
       <div>
+        <ChatMessages 
+          selectedUser={selectedUser}
+          messages={messages}
+          loggedInUser={loggedInUser}
+        />
 
+        <MessageInput 
+          selectedUser={selectedUser}
+          message={message}
+          setMessage={handleTyping}
+          handleMessageSend={handleMessageSend}
+        />
       </div>
     </div>
   )
