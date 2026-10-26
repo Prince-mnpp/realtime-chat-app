@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import React from "react";
 import { AppProvider } from "@/context/AppContext";
+import { SocketProvider } from "@/context/SocketContext";
 
 
 
@@ -17,7 +18,9 @@ export default function RootLayout({ children }: Readonly<{children: React.React
     >
       <body>
         <AppProvider>
-          {children}
+          <SocketProvider>
+            {children}
+          </SocketProvider>
         </AppProvider>
       </body>
     </html>

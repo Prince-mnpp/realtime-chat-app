@@ -1,5 +1,3 @@
-'use client'
-
 import { Message } from "@/app/chat/page";
 import { User } from "@/context/AppContext";
 import React, { useEffect, useMemo, useRef } from "react";

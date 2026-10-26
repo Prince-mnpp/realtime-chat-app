@@ -90,7 +90,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({children}) => {
   async function fetchChats(){
     const token = Cookies.get("token");
     try {
-      const {data} = await axios.get(`${user_service}/api/v1/chat/all`, {
+      const {data} = await axios.get(`${chat_service}/api/v1/chat/all`, {
         headers:{
           Authorization: `Bearer ${token}`,
         }

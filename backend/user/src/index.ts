@@ -21,7 +21,7 @@ if (!redisUrl) {
 
 export const redisClient = createClient({
   url: redisUrl,
-  pingInterval: 30000,
+  pingInterval: 30000, // after every 3 seconds redis try to retry creating client ... if it fails
   socket: {
     tls: true,
     connectTimeout: 20000, // Give Upstash TLS 20 seconds to establish
