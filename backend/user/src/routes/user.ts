@@ -1,8 +1,10 @@
 import express from "express";
-import { getAllUsers, getAUser, loginUser, myProfile, updateName, verifyUser } from "../controllers/User.js";
+import { getAllUsers, getAUser, loginUser, myProfile, registerUser, updateName, verifyUser } from "../controllers/User.js";
 import { isAuth } from "../middleware/isAuth.js";
 
 const router = express.Router();
+
+router.post("/register", registerUser);
 
 router.post("/login", loginUser);
 

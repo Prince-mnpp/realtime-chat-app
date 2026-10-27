@@ -5,6 +5,93 @@ import { publishToQueue } from "../config/rabbitmq.js";
 import {User} from "../model/User.js";
 import { generateToken } from "../config/generateToken.js";
 import type { AuthenticatedRequest } from "../middleware/isAuth.js";
+import { registerUserSchema } from "../validators/user.js";
+import { createAccessToken, createRefreshToken, createSession, hashPassword, hashtoken } from "../utils/user.js";
+
+export const registerUser = TryCatch(async(req: Request, res: Response) => {
+  const { data, error } = registerUserSchema.safeParse(req.body);
+
+  if (error) {
+    res.status(400).json({
+      message: error.issues[0]?.message ?? "Invalid input",
+    });
+    return;
+  }
+
+  const {name, email, mobileNumber, password} = data;
+
+  const userExist = await User.findOne({email});
+
+  if(userExist){
+    res.status(409).json({
+      message: "User already exists"
+    })
+    return;
+  }
+
+  const passwordHash = await hashPassword(password);
+
+  const registrationIp: string | undefined = req.ip;
+
+  const user = await User.create({
+    name,
+    email,
+    mobileNumber,
+    passwordHash,
+    emailVerified: false,
+    ...(registrationIp ? { registrationIp } : {}),
+  })
+
+  const session = await createSession(user._id.toString(), {
+  ...(registrationIp !== undefined && { ip: registrationIp }),
+  ...(req.headers["user-agent"] !== undefined && {
+    userAgent: req.headers["user-agent"],
+  }),
+});
+
+  const accessToken = createAccessToken({
+    id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+    isEmailValid: user.emailVerified,
+    sessionId: session.id,
+  })
+
+  const refreshToken = createRefreshToken(session.id);
+
+  session.refreshTokenHash = hashtoken(refreshToken);
+  await session.save();
+
+  const cookieConfig = {
+    httpOnly : true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+  };
+
+  res.cookie("access_token", accessToken, {
+    ...cookieConfig,
+    maxAge: 15 * 60 * 1000,
+    path: "/"
+  })
+
+  res.cookie("refresh_token", refreshToken, {
+    ...cookieConfig,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: "/",
+  });
+
+  res.status(201).json({
+    message: "Registration Successfull",
+
+    user: {
+      id: user._id.toString,
+      name: user.name,
+      email: user.email,
+      mobileNumber: user.mobileNumber,
+      emailVerified: user.emailVerified,
+    },
+  });
+})
 
 export const loginUser = TryCatch(async(req : Request, res :        Response) => {
     const {email} = req.body;
@@ -117,7 +204,14 @@ export const updateName = TryCatch(async(req: AuthenticatedRequest, res) => {
 });
 
 export const getAllUsers = TryCatch(async(req: AuthenticatedRequest, res) => {
-  const users = await User.find({ _id: { $ne: req.user?._id } });
+  if(!req.user?._id){
+    res.status(401).json({
+      message: "Authentication Required"
+    })
+    return;
+  }
+
+  const users = await User.find({ _id: { $ne: req.user._id } });
 
   res.json(users);
 });
