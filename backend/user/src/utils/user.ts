@@ -56,7 +56,7 @@ export const createRefreshToken = (sessionId: string): string => {
     algorithm: "HS256",
     expiresIn: "7d"
   }
-)
+  )
 }
 
 export const hashPassword = async (password : string) => {
